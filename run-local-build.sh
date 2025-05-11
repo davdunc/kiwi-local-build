@@ -67,9 +67,6 @@ if [ "$BRANCH" == "all" ]; then
     --privileged \
     --device /dev/loop-control \
     --device /dev/loop0 \
-    --device /dev/loop1 \
-    --device /dev/loop2 \
-    --device /dev/loop3 \
     -v "$(pwd)/output:/build/output:Z" \
     --entrypoint /bin/bash \
     kiwi-fedora-builder:latest \
@@ -81,9 +78,6 @@ else
     --privileged \
     --device /dev/loop-control \
     --device /dev/loop0 \
-    --device /dev/loop1 \
-    --device /dev/loop2 \
-    --device /dev/loop3 \
     -v "$(pwd)/output:/build/output:Z" \
     --entrypoint /bin/bash \
     kiwi-fedora-builder:latest \
