@@ -53,51 +53,18 @@ git checkout "$BRANCH" || { echo "Branch $BRANCH not found"; exit 1; }
 git pull origin "$BRANCH"
 cd -
 
-# Find all kiwi.xml files in the repository
-echo "Searching for kiwi.xml files containing the $IMAGE_PROFILE profile..."
-XML_FILES=$(find "$REPO_DIR" -name "kiwi.xml")
-
-# Initialize a variable to track if we found the profile
-PROFILE_FOUND=false
-PROFILE_XML=""
-
-# Check each XML file for the profile
-for XML_FILE in $XML_FILES; do
-  # Check if the file contains the profile name
-  if grep -q "<profile name=\"$IMAGE_PROFILE\"" "$XML_FILE"; then
-    echo "Found profile $IMAGE_PROFILE in $XML_FILE"
-    PROFILE_FOUND=true
-    PROFILE_XML="$XML_FILE"
-    break
-  fi
-done
-
-# If profile not found, list available profiles
-if [ "$PROFILE_FOUND" = false ]; then
-  echo "Error: Could not find profile $IMAGE_PROFILE in any kiwi.xml file"
-  echo "Available profiles:"
-  for XML_FILE in $XML_FILES; do
-    echo "In $XML_FILE:"
-    grep -o "<profile name=\"[^\"]*\"" "$XML_FILE" | sed 's/<profile name="/  /' | sed 's/"//'
-  done
-  exit 1
-fi
-
-# Get the directory containing the XML file
-CONFIG_DIR=$(dirname "$PROFILE_XML")
-echo "Using configuration directory: $CONFIG_DIR"
-
 # Create output directory for this image
 IMAGE_OUTPUT="$OUTPUT_DIR/$BRANCH/$IMAGE_PROFILE"
 mkdir -p "$IMAGE_OUTPUT"
 
 echo "================================================"
-echo "Building image: $IMAGE_PROFILE from $CONFIG_DIR"
+echo "Building image: $IMAGE_PROFILE for branch: $BRANCH"
 echo "================================================"
 
-# Run kiwi to build the image
+# Run kiwi to build the image - use the repository root as the description directory
+# kiwi-ng will find the appropriate XML and profile
 kiwi-ng --type oem system build \
-  --description "$CONFIG_DIR" \
+  --description "$REPO_DIR" \
   --target-dir "$IMAGE_OUTPUT" \
   --profile "$IMAGE_PROFILE"
 
