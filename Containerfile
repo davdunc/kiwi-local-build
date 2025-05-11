@@ -15,6 +15,7 @@ RUN dnf update -y && \
     wget \
     curl \
     python3-pip \
+    shadow-utils \
     && dnf clean all
 
 # Install additional tools that might be needed
