@@ -66,16 +66,18 @@ if [ "$BRANCH" == "all" ]; then
   sudo podman run --rm \
     --privileged \
     -v "$(pwd)/output:/build/output:Z" \
+    --entrypoint /bin/bash \
     kiwi-fedora-builder:latest \
-    bash -c "/build/scripts/build-all-branches.sh --output-dir /build/output --profile \"$IMAGE_PROFILE\""
+    -c "/build/scripts/build-all-branches.sh --output-dir /build/output --profile '$IMAGE_PROFILE'"
 else
   # Build specific branch
   echo "Building image for branch: $BRANCH"
   sudo podman run --rm \
     --privileged \
     -v "$(pwd)/output:/build/output:Z" \
+    --entrypoint /bin/bash \
     kiwi-fedora-builder:latest \
-    bash -c "/build/scripts/build-image.sh --branch \"$BRANCH\" --output-dir /build/output --profile \"$IMAGE_PROFILE\""
+    -c "/build/scripts/build-image.sh --branch '$BRANCH' --output-dir /build/output --profile '$IMAGE_PROFILE'"
 fi
 
 # Fix permissions on output directory since it was created by root
