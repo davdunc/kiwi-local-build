@@ -60,14 +60,14 @@ if [ "$BRANCH" == "all" ]; then
     --privileged \
     -v "$(pwd)/output:/build/output:Z" \
     kiwi-fedora-builder:latest \
-    /build/scripts/build-all-branches.sh --output-dir /build/output --profile "$IMAGE_PROFILE"
+    bash -c "/build/scripts/build-all-branches.sh --output-dir /build/output --profile \"$IMAGE_PROFILE\""
 else
   # Build specific branch
   podman run --rm \
     --privileged \
     -v "$(pwd)/output:/build/output:Z" \
     kiwi-fedora-builder:latest \
-    /build/scripts/build-image.sh --branch "$BRANCH" --output-dir /build/output --profile "$IMAGE_PROFILE"
+    bash -c "/build/scripts/build-image.sh --branch \"$BRANCH\" --output-dir /build/output --profile \"$IMAGE_PROFILE\""
 fi
 
 echo "Build process complete! Output files are in $OUTPUT_DIR"
