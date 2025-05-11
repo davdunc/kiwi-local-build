@@ -53,38 +53,51 @@ git checkout "$BRANCH" || { echo "Branch $BRANCH not found"; exit 1; }
 git pull origin "$BRANCH"
 cd -
 
-# Look specifically for the Cloud-Base-AmazonEC2 profile in the oem directory
-OEM_DIR=$(find "$REPO_DIR" -path "*/oem/*/kiwi.xml" -exec dirname {} \; | grep -i "Cloud-Base-AmazonEC2" || true)
+# Find all kiwi.xml files in the repository
+echo "Searching for kiwi.xml files containing the $IMAGE_PROFILE profile..."
+XML_FILES=$(find "$REPO_DIR" -name "kiwi.xml")
 
-if [ -z "$OEM_DIR" ]; then
-  # If not found directly, look for any directory that might contain this profile
-  echo "Searching for $IMAGE_PROFILE profile in oem directories..."
-  OEM_DIRS=$(find "$REPO_DIR" -path "*/oem/*/kiwi.xml" -exec dirname {} \;)
-  
-  for DIR in $OEM_DIRS; do
-    if grep -q "$IMAGE_PROFILE" "$DIR/kiwi.xml"; then
-      OEM_DIR="$DIR"
-      break
-    fi
+# Initialize a variable to track if we found the profile
+PROFILE_FOUND=false
+PROFILE_XML=""
+
+# Check each XML file for the profile
+for XML_FILE in $XML_FILES; do
+  # Check if the file contains the profile name
+  if grep -q "<profile name=\"$IMAGE_PROFILE\"" "$XML_FILE"; then
+    echo "Found profile $IMAGE_PROFILE in $XML_FILE"
+    PROFILE_FOUND=true
+    PROFILE_XML="$XML_FILE"
+    break
+  fi
+done
+
+# If profile not found, list available profiles
+if [ "$PROFILE_FOUND" = false ]; then
+  echo "Error: Could not find profile $IMAGE_PROFILE in any kiwi.xml file"
+  echo "Available profiles:"
+  for XML_FILE in $XML_FILES; do
+    echo "In $XML_FILE:"
+    grep -o "<profile name=\"[^\"]*\"" "$XML_FILE" | sed 's/<profile name="/  /' | sed 's/"//'
   done
-fi
-
-if [ -z "$OEM_DIR" ]; then
-  echo "Error: Could not find $IMAGE_PROFILE profile in oem directories"
   exit 1
 fi
 
-echo "================================================"
-echo "Building image: $IMAGE_PROFILE from $OEM_DIR"
-echo "================================================"
+# Get the directory containing the XML file
+CONFIG_DIR=$(dirname "$PROFILE_XML")
+echo "Using configuration directory: $CONFIG_DIR"
 
 # Create output directory for this image
 IMAGE_OUTPUT="$OUTPUT_DIR/$BRANCH/$IMAGE_PROFILE"
 mkdir -p "$IMAGE_OUTPUT"
 
+echo "================================================"
+echo "Building image: $IMAGE_PROFILE from $CONFIG_DIR"
+echo "================================================"
+
 # Run kiwi to build the image
 kiwi-ng --type oem system build \
-  --description "$OEM_DIR" \
+  --description "$CONFIG_DIR" \
   --target-dir "$IMAGE_OUTPUT" \
   --profile "$IMAGE_PROFILE"
 
