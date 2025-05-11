@@ -62,8 +62,8 @@ echo "Building image: $IMAGE_PROFILE for branch: $BRANCH"
 echo "================================================"
 
 # Run kiwi to build the image - use the repository root as the description directory
-# kiwi will find the appropriate XML and profile
-kiwi --type oem system build \
+kiwi-ng system build \
+  --type oem \
   --description "$REPO_DIR" \
   --target-dir "$IMAGE_OUTPUT" \
   --profile "$IMAGE_PROFILE"
