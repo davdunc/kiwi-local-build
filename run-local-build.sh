@@ -65,6 +65,11 @@ if [ "$BRANCH" == "all" ]; then
   echo "Building images for all branches (rawhide, f41, f42)..."
   sudo podman run --rm \
     --privileged \
+    --device /dev/loop-control \
+    --device /dev/loop0 \
+    --device /dev/loop1 \
+    --device /dev/loop2 \
+    --device /dev/loop3 \
     -v "$(pwd)/output:/build/output:Z" \
     --entrypoint /bin/bash \
     kiwi-fedora-builder:latest \
@@ -74,6 +79,11 @@ else
   echo "Building image for branch: $BRANCH"
   sudo podman run --rm \
     --privileged \
+    --device /dev/loop-control \
+    --device /dev/loop0 \
+    --device /dev/loop1 \
+    --device /dev/loop2 \
+    --device /dev/loop3 \
     -v "$(pwd)/output:/build/output:Z" \
     --entrypoint /bin/bash \
     kiwi-fedora-builder:latest \
