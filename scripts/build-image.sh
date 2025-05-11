@@ -61,12 +61,9 @@ echo "================================================"
 echo "Building image: $IMAGE_PROFILE for branch: $BRANCH"
 echo "================================================"
 
-# Run kiwi to build the image - use the repository root as the description directory
-kiwi-ng system build \
-  --type oem \
-  --description "$REPO_DIR" \
-  --target-dir "$IMAGE_OUTPUT" \
-  --profile "$IMAGE_PROFILE"
+# Run kiwi to build the image using the syntax from the fedora-kiwi-descriptions repo
+kiwi-ng --type="oem" --profile="$IMAGE_PROFILE" --kiwi-file="Fedora.kiwi" --color-output \
+  system build --description "$REPO_DIR" --target-dir "$IMAGE_OUTPUT"
 
 echo "Image build complete: $IMAGE_PROFILE"
 echo "Output saved to: $IMAGE_OUTPUT"
