@@ -1,0 +1,12 @@
+# Output directory
+output/
+
+# Temporary files
+*.tmp
+*.log
+*.swp
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
