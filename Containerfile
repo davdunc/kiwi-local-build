@@ -1,9 +1,9 @@
 FROM fedora:latest
 
-# Install kiwi-ng and dependencies
+# Install kiwi and dependencies
 RUN dnf update -y && \
     dnf install -y \
-    python3-kiwi \
+    kiwi \
     git \
     tar \
     gzip \
