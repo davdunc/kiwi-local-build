@@ -5,6 +5,7 @@ This project provides tools to build Fedora kiwi images locally using Podman con
 ## Prerequisites
 
 - Podman installed and running
+- Sudo privileges (required for running privileged containers)
 - Sufficient disk space for building images
 - Internet connection to pull repositories
 - SELinux in Permissive or Disabled mode (kiwi will not function correctly with SELinux in Enforcing mode)
@@ -13,7 +14,7 @@ This project provides tools to build Fedora kiwi images locally using Podman con
 
 1. Clone this repository:
    ```
-   git clone <repository-url> kiwi-local-build
+   git clone https://github.com/davdunc/kiwi-local-build.git
    cd kiwi-local-build
    ```
 
@@ -71,17 +72,18 @@ Available branch options: `rawhide`, `f41`, `f42`
 
 ## Output
 
-Built images will be available in the `output` directory (or your specified output directory), organized by branch.
+Built images will be available in the `output` directory (or your specified output directory), organized by branch. The script will automatically fix permissions on the output directory since it's created by the root user inside the container.
 
 ## Troubleshooting
 
 If you encounter issues:
 
 1. Verify SELinux is in Permissive or Disabled mode
-2. Ensure Podman has sufficient resources allocated
-3. Check network connectivity to Pagure and Fedora repositories
-4. Verify you have sufficient disk space
-5. Look at the build logs for specific error messages
+2. Ensure you have sudo privileges
+3. Ensure Podman has sufficient resources allocated
+4. Check network connectivity to Pagure and Fedora repositories
+5. Verify you have sufficient disk space
+6. Look at the build logs for specific error messages
 
 ## Directory Structure
 
@@ -92,3 +94,4 @@ If you encounter issues:
 ## Important Note
 
 This build system uses Podman exclusively. Do not use Docker for these builds.
+The script requires sudo privileges to run privileged containers.

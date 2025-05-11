@@ -49,25 +49,37 @@ fi
 # Create output directory if it doesn't exist
 mkdir -p "$OUTPUT_DIR"
 
-# Build the container image using podman
+# Check if user has sudo privileges
+if ! command -v sudo &> /dev/null; then
+  echo "ERROR: sudo is required to run privileged containers but is not installed."
+  exit 1
+fi
+
+# Build the container image using podman with sudo
 echo "Building container image for kiwi builds..."
-podman build -t kiwi-fedora-builder:latest -f Containerfile .
+sudo podman build -t kiwi-fedora-builder:latest -f Containerfile .
 
 # Run the container based on branch selection
 if [ "$BRANCH" == "all" ]; then
   # Build all branches
-  podman run --rm \
+  echo "Building images for all branches (rawhide, f41, f42)..."
+  sudo podman run --rm \
     --privileged \
     -v "$(pwd)/output:/build/output:Z" \
     kiwi-fedora-builder:latest \
     bash -c "/build/scripts/build-all-branches.sh --output-dir /build/output --profile \"$IMAGE_PROFILE\""
 else
   # Build specific branch
-  podman run --rm \
+  echo "Building image for branch: $BRANCH"
+  sudo podman run --rm \
     --privileged \
     -v "$(pwd)/output:/build/output:Z" \
     kiwi-fedora-builder:latest \
     bash -c "/build/scripts/build-image.sh --branch \"$BRANCH\" --output-dir /build/output --profile \"$IMAGE_PROFILE\""
 fi
+
+# Fix permissions on output directory since it was created by root
+echo "Fixing permissions on output directory..."
+sudo chown -R $(id -u):$(id -g) "$OUTPUT_DIR"
 
 echo "Build process complete! Output files are in $OUTPUT_DIR"
